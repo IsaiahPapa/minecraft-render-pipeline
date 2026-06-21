@@ -1,0 +1,28 @@
+{
+  "_comment": "Hand-maintained list of entity identifiers that either (a) are not present in the Bedrock vanilla pack, or (b) render with a default texture/variant that looks wrong and needs a manual override. Each entry points to a manually-produced asset dropped into output/<entity_slug>/ and flagged source=manual in manifest.json. Expect this list to stay short.",
+  "overrides": {
+    "minecraft:illusioner": {
+      "reason": "Java Edition exclusive mob, not present in Bedrock vanilla RP.",
+      "needs_review": true
+    }
+  },
+  "rest_pose_rotations": {
+    "_comment": "Per-entity, per-bone rotation overrides in degrees. Applied at BONE level if the bone has no child bones (children would inherit); applied at CUBE level if the bone has child bones (children stay at their authored positions, only the body cube rotates). Mobs NOT listed here already have the correct rotation in their geo file (either bind_pose_rotation on the body bone for legacy format, or per-cube rotation for modern 1.16+ format). Mobs listed here are missing the rotation entirely in their geo file.",
+    "minecraft:cat": { "body": [90, 0, 0] },
+    "minecraft:ocelot": { "body": [90, 0, 0] },
+    "minecraft:fox": { "body": [90, 0, 0] },
+    "minecraft:llama": { "body": [90, 0, 0] },
+    "minecraft:trader_llama": { "body": [90, 0, 0] },
+    "minecraft:wolf": { "body": [90, 0, 0] },
+    "minecraft:spider": {
+      "leg0": [-30, 0, 30],
+      "leg1": [-30, 0, -30],
+      "leg2": [30, 0, 30],
+      "leg3": [30, 0, -30],
+      "leg4": [30, 0, 30],
+      "leg5": [30, 0, -30],
+      "leg6": [-30, 0, 30],
+      "leg7": [-30, 0, -30]
+    }
+  }
+}

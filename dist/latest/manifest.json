@@ -1,0 +1,836 @@
+{
+  "minecraft_version": "1.26.30.5",
+  "generated_at": "2026-06-21T23:36:54.433Z",
+  "entities": {
+    "minecraft:allay": {
+      "headshot": "allay/headshot.png",
+      "spin_webp": "allay/spin.webp",
+      "spin_gif": "allay/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:armadillo": {
+      "headshot": "armadillo/headshot.png",
+      "spin_webp": "armadillo/spin.webp",
+      "spin_gif": "armadillo/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:armor_stand": {
+      "headshot": "armor_stand/headshot.png",
+      "spin_webp": "armor_stand/spin.webp",
+      "spin_gif": "armor_stand/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:arrow": {
+      "headshot": "arrow/headshot.png",
+      "spin_webp": "arrow/spin.webp",
+      "spin_gif": "arrow/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:axolotl": {
+      "headshot": "axolotl/headshot.png",
+      "spin_webp": "axolotl/spin.webp",
+      "spin_gif": "axolotl/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:bat": {
+      "headshot": "bat/headshot.png",
+      "spin_webp": "bat/spin.webp",
+      "spin_gif": "bat/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:bee": {
+      "headshot": "bee/headshot.png",
+      "spin_webp": "bee/spin.webp",
+      "spin_gif": "bee/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:blaze": {
+      "headshot": "blaze/headshot.png",
+      "spin_webp": "blaze/spin.webp",
+      "spin_gif": "blaze/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:bogged": {
+      "headshot": "bogged/headshot.png",
+      "spin_webp": "bogged/spin.webp",
+      "spin_gif": "bogged/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:breeze": {
+      "headshot": "breeze/headshot.png",
+      "spin_webp": "breeze/spin.webp",
+      "spin_gif": "breeze/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:camel": {
+      "headshot": "camel/headshot.png",
+      "spin_webp": "camel/spin.webp",
+      "spin_gif": "camel/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:camel_husk": {
+      "headshot": "camel_husk/headshot.png",
+      "spin_webp": "camel_husk/spin.webp",
+      "spin_gif": "camel_husk/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:cat": {
+      "headshot": "cat/headshot.png",
+      "spin_webp": "cat/spin.webp",
+      "spin_gif": "cat/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:cave_spider": {
+      "headshot": "cave_spider/headshot.png",
+      "spin_webp": "cave_spider/spin.webp",
+      "spin_gif": "cave_spider/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:chest_minecart": {
+      "headshot": "chest_minecart/headshot.png",
+      "spin_webp": "chest_minecart/spin.webp",
+      "spin_gif": "chest_minecart/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:chicken": {
+      "headshot": "chicken/headshot.png",
+      "spin_webp": "chicken/spin.webp",
+      "spin_gif": "chicken/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:cod": {
+      "headshot": "cod/headshot.png",
+      "spin_webp": "cod/spin.webp",
+      "spin_gif": "cod/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:command_block_minecart": {
+      "headshot": "command_block_minecart/headshot.png",
+      "spin_webp": "command_block_minecart/spin.webp",
+      "spin_gif": "command_block_minecart/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:copper_golem": {
+      "headshot": "copper_golem/headshot.png",
+      "spin_webp": "copper_golem/spin.webp",
+      "spin_gif": "copper_golem/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:cow": {
+      "headshot": "cow/headshot.png",
+      "spin_webp": "cow/spin.webp",
+      "spin_gif": "cow/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:creaking": {
+      "headshot": "creaking/headshot.png",
+      "spin_webp": "creaking/spin.webp",
+      "spin_gif": "creaking/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:creeper": {
+      "headshot": "creeper/headshot.png",
+      "spin_webp": "creeper/spin.webp",
+      "spin_gif": "creeper/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:dolphin": {
+      "headshot": "dolphin/headshot.png",
+      "spin_webp": "dolphin/spin.webp",
+      "spin_gif": "dolphin/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:donkey": {
+      "headshot": "donkey/headshot.png",
+      "spin_webp": "donkey/spin.webp",
+      "spin_gif": "donkey/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:dragon_fireball": {
+      "headshot": "dragon_fireball/headshot.png",
+      "spin_webp": "dragon_fireball/spin.webp",
+      "spin_gif": "dragon_fireball/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:drowned": {
+      "headshot": "drowned/headshot.png",
+      "spin_webp": "drowned/spin.webp",
+      "spin_gif": "drowned/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:egg": {
+      "headshot": "egg/headshot.png",
+      "spin_webp": "egg/spin.webp",
+      "spin_gif": "egg/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:elder_guardian": {
+      "headshot": "elder_guardian/headshot.png",
+      "spin_webp": "elder_guardian/spin.webp",
+      "spin_gif": "elder_guardian/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ender_crystal": {
+      "headshot": "ender_crystal/headshot.png",
+      "spin_webp": "ender_crystal/spin.webp",
+      "spin_gif": "ender_crystal/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ender_dragon": {
+      "headshot": "ender_dragon/headshot.png",
+      "spin_webp": "ender_dragon/spin.webp",
+      "spin_gif": "ender_dragon/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ender_pearl": {
+      "headshot": "ender_pearl/headshot.png",
+      "spin_webp": "ender_pearl/spin.webp",
+      "spin_gif": "ender_pearl/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:enderman": {
+      "headshot": "enderman/headshot.png",
+      "spin_webp": "enderman/spin.webp",
+      "spin_gif": "enderman/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:endermite": {
+      "headshot": "endermite/headshot.png",
+      "spin_webp": "endermite/spin.webp",
+      "spin_gif": "endermite/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:evocation_illager": {
+      "headshot": "evocation_illager/headshot.png",
+      "spin_webp": "evocation_illager/spin.webp",
+      "spin_gif": "evocation_illager/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:eye_of_ender_signal": {
+      "headshot": "eye_of_ender_signal/headshot.png",
+      "spin_webp": "eye_of_ender_signal/spin.webp",
+      "spin_gif": "eye_of_ender_signal/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:fireball": {
+      "headshot": "fireball/headshot.png",
+      "spin_webp": "fireball/spin.webp",
+      "spin_gif": "fireball/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:fireworks_rocket": {
+      "headshot": "fireworks_rocket/headshot.png",
+      "spin_webp": "fireworks_rocket/spin.webp",
+      "spin_gif": "fireworks_rocket/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:fishing_hook": {
+      "headshot": "fishing_hook/headshot.png",
+      "spin_webp": "fishing_hook/spin.webp",
+      "spin_gif": "fishing_hook/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:fox": {
+      "headshot": "fox/headshot.png",
+      "spin_webp": "fox/spin.webp",
+      "spin_gif": "fox/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:frog": {
+      "headshot": "frog/headshot.png",
+      "spin_webp": "frog/spin.webp",
+      "spin_gif": "frog/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ghast": {
+      "headshot": "ghast/headshot.png",
+      "spin_webp": "ghast/spin.webp",
+      "spin_gif": "ghast/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:glow_squid": {
+      "headshot": "glow_squid/headshot.png",
+      "spin_webp": "glow_squid/spin.webp",
+      "spin_gif": "glow_squid/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:goat": {
+      "headshot": "goat/headshot.png",
+      "spin_webp": "goat/spin.webp",
+      "spin_gif": "goat/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:guardian": {
+      "headshot": "guardian/headshot.png",
+      "spin_webp": "guardian/spin.webp",
+      "spin_gif": "guardian/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:happy_ghast": {
+      "headshot": "happy_ghast/headshot.png",
+      "spin_webp": "happy_ghast/spin.webp",
+      "spin_gif": "happy_ghast/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:hoglin": {
+      "headshot": "hoglin/headshot.png",
+      "spin_webp": "hoglin/spin.webp",
+      "spin_gif": "hoglin/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:hopper_minecart": {
+      "headshot": "hopper_minecart/headshot.png",
+      "spin_webp": "hopper_minecart/spin.webp",
+      "spin_gif": "hopper_minecart/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:horse": {
+      "headshot": "horse/headshot.png",
+      "spin_webp": "horse/spin.webp",
+      "spin_gif": "horse/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:husk": {
+      "headshot": "husk/headshot.png",
+      "spin_webp": "husk/spin.webp",
+      "spin_gif": "husk/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:iron_golem": {
+      "headshot": "iron_golem/headshot.png",
+      "spin_webp": "iron_golem/spin.webp",
+      "spin_gif": "iron_golem/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:leash_knot": {
+      "headshot": "leash_knot/headshot.png",
+      "spin_webp": "leash_knot/spin.webp",
+      "spin_gif": "leash_knot/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:lingering_potion": {
+      "headshot": "lingering_potion/headshot.png",
+      "spin_webp": "lingering_potion/spin.webp",
+      "spin_gif": "lingering_potion/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:llama": {
+      "headshot": "llama/headshot.png",
+      "spin_webp": "llama/spin.webp",
+      "spin_gif": "llama/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:llama_spit": {
+      "headshot": "llama_spit/headshot.png",
+      "spin_webp": "llama_spit/spin.webp",
+      "spin_gif": "llama_spit/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:magma_cube": {
+      "headshot": "magma_cube/headshot.png",
+      "spin_webp": "magma_cube/spin.webp",
+      "spin_gif": "magma_cube/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:minecart": {
+      "headshot": "minecart/headshot.png",
+      "spin_webp": "minecart/spin.webp",
+      "spin_gif": "minecart/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:mooshroom": {
+      "headshot": "mooshroom/headshot.png",
+      "spin_webp": "mooshroom/spin.webp",
+      "spin_gif": "mooshroom/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:mule": {
+      "headshot": "mule/headshot.png",
+      "spin_webp": "mule/spin.webp",
+      "spin_gif": "mule/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:nautilus": {
+      "headshot": "nautilus/headshot.png",
+      "spin_webp": "nautilus/spin.webp",
+      "spin_gif": "nautilus/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:npc": {
+      "headshot": "npc/headshot.png",
+      "spin_webp": "npc/spin.webp",
+      "spin_gif": "npc/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ocelot": {
+      "headshot": "ocelot/headshot.png",
+      "spin_webp": "ocelot/spin.webp",
+      "spin_gif": "ocelot/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:panda": {
+      "headshot": "panda/headshot.png",
+      "spin_webp": "panda/spin.webp",
+      "spin_gif": "panda/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:parched": {
+      "headshot": "parched/headshot.png",
+      "spin_webp": "parched/spin.webp",
+      "spin_gif": "parched/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:parrot": {
+      "headshot": "parrot/headshot.png",
+      "spin_webp": "parrot/spin.webp",
+      "spin_gif": "parrot/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:phantom": {
+      "headshot": "phantom/headshot.png",
+      "spin_webp": "phantom/spin.webp",
+      "spin_gif": "phantom/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:pig": {
+      "headshot": "pig/headshot.png",
+      "spin_webp": "pig/spin.webp",
+      "spin_gif": "pig/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:piglin": {
+      "headshot": "piglin/headshot.png",
+      "spin_webp": "piglin/spin.webp",
+      "spin_gif": "piglin/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:piglin_brute": {
+      "headshot": "piglin_brute/headshot.png",
+      "spin_webp": "piglin_brute/spin.webp",
+      "spin_gif": "piglin_brute/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:pillager": {
+      "headshot": "pillager/headshot.png",
+      "spin_webp": "pillager/spin.webp",
+      "spin_gif": "pillager/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:player": {
+      "headshot": "player/headshot.png",
+      "spin_webp": "player/spin.webp",
+      "spin_gif": "player/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:polar_bear": {
+      "headshot": "polar_bear/headshot.png",
+      "spin_webp": "polar_bear/spin.webp",
+      "spin_gif": "polar_bear/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:pufferfish": {
+      "headshot": "pufferfish/headshot.png",
+      "spin_webp": "pufferfish/spin.webp",
+      "spin_gif": "pufferfish/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:rabbit": {
+      "headshot": "rabbit/headshot.png",
+      "spin_webp": "rabbit/spin.webp",
+      "spin_gif": "rabbit/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:ravager": {
+      "headshot": "ravager/headshot.png",
+      "spin_webp": "ravager/spin.webp",
+      "spin_gif": "ravager/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:salmon": {
+      "headshot": "salmon/headshot.png",
+      "spin_webp": "salmon/spin.webp",
+      "spin_gif": "salmon/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:shulker": {
+      "headshot": "shulker/headshot.png",
+      "spin_webp": "shulker/spin.webp",
+      "spin_gif": "shulker/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:shulker_bullet": {
+      "headshot": "shulker_bullet/headshot.png",
+      "spin_webp": "shulker_bullet/spin.webp",
+      "spin_gif": "shulker_bullet/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:silverfish": {
+      "headshot": "silverfish/headshot.png",
+      "spin_webp": "silverfish/spin.webp",
+      "spin_gif": "silverfish/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:skeleton": {
+      "headshot": "skeleton/headshot.png",
+      "spin_webp": "skeleton/spin.webp",
+      "spin_gif": "skeleton/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:skeleton_horse": {
+      "headshot": "skeleton_horse/headshot.png",
+      "spin_webp": "skeleton_horse/spin.webp",
+      "spin_gif": "skeleton_horse/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:slime": {
+      "headshot": "slime/headshot.png",
+      "spin_webp": "slime/spin.webp",
+      "spin_gif": "slime/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:small_fireball": {
+      "headshot": "small_fireball/headshot.png",
+      "spin_webp": "small_fireball/spin.webp",
+      "spin_gif": "small_fireball/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:sniffer": {
+      "headshot": "sniffer/headshot.png",
+      "spin_webp": "sniffer/spin.webp",
+      "spin_gif": "sniffer/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:snow_golem": {
+      "headshot": "snow_golem/headshot.png",
+      "spin_webp": "snow_golem/spin.webp",
+      "spin_gif": "snow_golem/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:snowball": {
+      "headshot": "snowball/headshot.png",
+      "spin_webp": "snowball/spin.webp",
+      "spin_gif": "snowball/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:spider": {
+      "headshot": "spider/headshot.png",
+      "spin_webp": "spider/spin.webp",
+      "spin_gif": "spider/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:splash_potion": {
+      "headshot": "splash_potion/headshot.png",
+      "spin_webp": "splash_potion/spin.webp",
+      "spin_gif": "splash_potion/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:squid": {
+      "headshot": "squid/headshot.png",
+      "spin_webp": "squid/spin.webp",
+      "spin_gif": "squid/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:stray": {
+      "headshot": "stray/headshot.png",
+      "spin_webp": "stray/spin.webp",
+      "spin_gif": "stray/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:strider": {
+      "headshot": "strider/headshot.png",
+      "spin_webp": "strider/spin.webp",
+      "spin_gif": "strider/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:sulfur_cube": {
+      "headshot": "sulfur_cube/headshot.png",
+      "spin_webp": "sulfur_cube/spin.webp",
+      "spin_gif": "sulfur_cube/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:tadpole": {
+      "headshot": "tadpole/headshot.png",
+      "spin_webp": "tadpole/spin.webp",
+      "spin_gif": "tadpole/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:thrown_trident": {
+      "headshot": "thrown_trident/headshot.png",
+      "spin_webp": "thrown_trident/spin.webp",
+      "spin_gif": "thrown_trident/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:tnt_minecart": {
+      "headshot": "tnt_minecart/headshot.png",
+      "spin_webp": "tnt_minecart/spin.webp",
+      "spin_gif": "tnt_minecart/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:trader_llama": {
+      "headshot": "trader_llama/headshot.png",
+      "spin_webp": "trader_llama/spin.webp",
+      "spin_gif": "trader_llama/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:tripod_camera": {
+      "headshot": "tripod_camera/headshot.png",
+      "spin_webp": "tripod_camera/spin.webp",
+      "spin_gif": "tripod_camera/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:tropicalfish": {
+      "headshot": "tropicalfish/headshot.png",
+      "spin_webp": "tropicalfish/spin.webp",
+      "spin_gif": "tropicalfish/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:turtle": {
+      "headshot": "turtle/headshot.png",
+      "spin_webp": "turtle/spin.webp",
+      "spin_gif": "turtle/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:vex": {
+      "headshot": "vex/headshot.png",
+      "spin_webp": "vex/spin.webp",
+      "spin_gif": "vex/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:villager": {
+      "headshot": "villager/headshot.png",
+      "spin_webp": "villager/spin.webp",
+      "spin_gif": "villager/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:villager_v2": {
+      "headshot": "villager_v2/headshot.png",
+      "spin_webp": "villager_v2/spin.webp",
+      "spin_gif": "villager_v2/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:vindicator": {
+      "headshot": "vindicator/headshot.png",
+      "spin_webp": "vindicator/spin.webp",
+      "spin_gif": "vindicator/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wandering_trader": {
+      "headshot": "wandering_trader/headshot.png",
+      "spin_webp": "wandering_trader/spin.webp",
+      "spin_gif": "wandering_trader/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:warden": {
+      "headshot": "warden/headshot.png",
+      "spin_webp": "warden/spin.webp",
+      "spin_gif": "warden/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wither": {
+      "headshot": "wither/headshot.png",
+      "spin_webp": "wither/spin.webp",
+      "spin_gif": "wither/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wither_skeleton": {
+      "headshot": "wither_skeleton/headshot.png",
+      "spin_webp": "wither_skeleton/spin.webp",
+      "spin_gif": "wither_skeleton/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wither_skull": {
+      "headshot": "wither_skull/headshot.png",
+      "spin_webp": "wither_skull/spin.webp",
+      "spin_gif": "wither_skull/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wither_skull_dangerous": {
+      "headshot": "wither_skull_dangerous/headshot.png",
+      "spin_webp": "wither_skull_dangerous/spin.webp",
+      "spin_gif": "wither_skull_dangerous/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:wolf": {
+      "headshot": "wolf/headshot.png",
+      "spin_webp": "wolf/spin.webp",
+      "spin_gif": "wolf/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:xp_bottle": {
+      "headshot": "xp_bottle/headshot.png",
+      "spin_webp": "xp_bottle/spin.webp",
+      "spin_gif": "xp_bottle/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:xp_orb": {
+      "headshot": "xp_orb/headshot.png",
+      "spin_webp": "xp_orb/spin.webp",
+      "spin_gif": "xp_orb/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zoglin": {
+      "headshot": "zoglin/headshot.png",
+      "spin_webp": "zoglin/spin.webp",
+      "spin_gif": "zoglin/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie": {
+      "headshot": "zombie/headshot.png",
+      "spin_webp": "zombie/spin.webp",
+      "spin_gif": "zombie/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie_horse": {
+      "headshot": "zombie_horse/headshot.png",
+      "spin_webp": "zombie_horse/spin.webp",
+      "spin_gif": "zombie_horse/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie_nautilus": {
+      "headshot": "zombie_nautilus/headshot.png",
+      "spin_webp": "zombie_nautilus/spin.webp",
+      "spin_gif": "zombie_nautilus/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie_pigman": {
+      "headshot": "zombie_pigman/headshot.png",
+      "spin_webp": "zombie_pigman/spin.webp",
+      "spin_gif": "zombie_pigman/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie_villager": {
+      "headshot": "zombie_villager/headshot.png",
+      "spin_webp": "zombie_villager/spin.webp",
+      "spin_gif": "zombie_villager/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:zombie_villager_v2": {
+      "headshot": "zombie_villager_v2/headshot.png",
+      "spin_webp": "zombie_villager_v2/spin.webp",
+      "spin_gif": "zombie_villager_v2/spin.gif",
+      "source": "bedrock",
+      "needs_review": false
+    },
+    "minecraft:illusioner": {
+      "source": "manual",
+      "needs_review": true
+    }
+  }
+}

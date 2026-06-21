@@ -1,0 +1,102 @@
+name: render
+
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      force_all:
+        description: "Re-render every entity even if unchanged"
+        type: boolean
+        default: false
+      entity:
+        description: "Optional single entity id (e.g. minecraft:cow) — empty for full run"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run pipeline
+        env:
+          # SwiftShader WebGL is fine headless on Linux runners; no Xvfb needed
+          # but keep the env hook here in case a future Chromium version regresses.
+          PUPPETEER_SKIP_DOWNLOAD: "0"
+        run: |
+          ARGS=""
+          if [ "${{ inputs.force_all }}" = "true" ]; then ARGS="$ARGS --force-all"; fi
+          if [ -n "${{ inputs.entity }}" ]; then ARGS="$ARGS --entity ${{ inputs.entity }}"; fi
+          node cli.js $ARGS
+
+      - name: Verify output transparency (corner alpha = 0)
+        run: |
+          node -e '
+            const fs=require("fs"),path=require("path");
+            const sharp=require("sharp");
+            (async()=>{
+              const out="output";
+              if(!fs.existsSync(out)){console.log("no output dir");process.exit(0);}
+              let bad=0;
+              for(const slug of fs.readdirSync(out)){
+                const p=path.join(out,slug,"headshot.png");
+                if(!fs.existsSync(p))continue;
+                const {data,info}=await sharp(p).raw().toBuffer({resolveWithObject:true});
+                const c=info.channels;
+                const corners=[[0,0],[info.width-1,0],[0,info.height-1],[info.width-1,info.height-1]];
+                for(const [x,y] of corners){
+                  const a=data[(y*info.width+x)*c+c-1];
+                  if(a!==0){console.error("non-transparent corner",p,x,y,a);bad++;}
+                }
+              }
+              if(bad){console.error(bad,"bad corners");process.exit(1);}
+              console.log("transparency check ok");
+            })();
+          '
+
+      - name: Commit output
+        run: |
+          if [ -z "$(git status --porcelain output data)" ]; then
+            echo "no changes; pipeline was a no-op"
+            exit 0
+          fi
+          VERSION=$(node -p "require('./data/last-known-version.json').version || 'unknown'")
+          git add output data dist
+          git commit -m "render: Bedrock ${VERSION} ($(date -u +%Y-%m-%d))"
+          git push
+
+      - name: Cut release (on version change)
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./data/last-known-version.json').version || ''")
+          if [ -z "$VERSION" ]; then exit 0; fi
+          if gh release view "bedrock-$VERSION" >/dev/null 2>&1; then
+            echo "release bedrock-$VERSION already exists"
+            exit 0
+          fi
+          cd output && zip -r "../bedrock-$VERSION.zip" . && cd ..
+          gh release create "bedrock-$VERSION" "bedrock-$VERSION.zip" \
+            --title "Bedrock $VERSION" \
+            --notes "Automated render of Bedrock $VERSION. See manifest.json."

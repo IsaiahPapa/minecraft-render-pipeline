@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>mob render harness</title>
+    <!-- No CSS background colors: html/body stay transparent for alpha capture. -->
+    <style>
+      html, body { margin: 0; padding: 0; background: transparent; }
+      #c { display: block; width: 100vw; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <!--
+      three.js is loaded as an ES module from the local HTTP server
+      (started by render/capture.js) via an import map. This avoids file:// CORS
+      issues. The harness script below is also a module so it can use the
+      `import * as THREE from "three"` form.
+    -->
+    <script type="importmap">
+      { "imports": { "three": "/three.module.js" } }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+      // ---- scene setup ----------------------------------------------------
+      const canvas = document.getElementById("c");
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        preserveDrawingBuffer: true, // needed for page.screenshot to grab the drawn frame
+      });
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(1);
+
+      const scene = new THREE.Scene();
+
+      // Full-bright: MeshBasicMaterial ignores all lighting, showing pure
+      // texture colors (like a Minecraft wiki render). Lights are kept for
+      // potential future use but have no effect on the basic material.
+      const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+      scene.add(ambient);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.0);
+      dir.position.set(1, 2, 2);
+      scene.add(dir);
+
+      // Two cameras: perspective for the spin (orbit), orthographic for the
+      // headshot (true isometric, no vanishing points). Both are repositioned
+      // per-frame by setCamera().
+      const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);
+      const isoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
+
+      // ---- mesh construction from normalized mesh JSON --------------------
+      // Bedrock model space: 1 pixel = 1 unit; pivot/origin are in this space.
+      // Y is up. Convert to three.js coordinates: Bedrock (x, y, z) ->
+      // three (x, y, -z) so the front of the mob faces the camera at azimuth 0.
+      function bedrockToThree(v) {
+        return [v[0], v[1], -v[2]];
+      }
+
+      // Box geometry for one cube, with per-face UVs.
+      // `bonePivot` is subtracted from cube.origin so the cube mesh sits at
+      // (origin - pivot) in the bone group's local frame. The bone group is
+      // positioned at the pivot, so the cube ends up at its authored absolute
+      // position, and rotates correctly around the pivot when the bone rotates.
+      function buildCubeGeometry(cube, bonePivot) {
+        const bp = bonePivot || [0, 0, 0];
+        // Subtract pivot (cube origin is absolute in bone-local frame).
+        const rel = [cube.origin[0] - bp[0], cube.origin[1] - bp[1], cube.origin[2] - bp[2]];
+        const [dx, dy, dz] = cube.size;
+        const inflate = cube.inflate || 0;
+        // min/max in BEDROCK space (Z not yet flipped).
+        const bmin = [rel[0] - inflate, rel[1] - inflate, rel[2] - inflate];
+        const bmax = [rel[0] + dx + inflate, rel[1] + dy + inflate, rel[2] + dz + inflate];
+        const positions = [];
+        const uvs = [];
+        const indices = [];
+        const t = (v) => bedrockToThree(v); // flip Z for three.js
+        const faces = [
+          // north (front, -Z in bedrock) — corner ordering CCW from outside
+          { name: "north", p: [[bmin[0], bmin[1], bmin[2]], [bmax[0], bmin[1], bmin[2]], [bmax[0], bmax[1], bmin[2]], [bmin[0], bmax[1], bmin[2]]] },
+          // south (back, +Z)
+          { name: "south", p: [[bmax[0], bmin[1], bmax[2]], [bmin[0], bmin[1], bmax[2]], [bmin[0], bmax[1], bmax[2]], [bmax[0], bmax[1], bmax[2]]] },
+          // east (right, +X)
+          { name: "east",  p: [[bmax[0], bmin[1], bmin[2]], [bmax[0], bmin[1], bmax[2]], [bmax[0], bmax[1], bmax[2]], [bmax[0], bmax[1], bmin[2]]] },
+          // west (left, -X)
+          { name: "west",  p: [[bmin[0], bmin[1], bmax[2]], [bmin[0], bmin[1], bmin[2]], [bmin[0], bmax[1], bmin[2]], [bmin[0], bmax[1], bmax[2]]] },
+          // up (top, +Y)
+          { name: "up",    p: [[bmin[0], bmax[1], bmax[2]], [bmax[0], bmax[1], bmax[2]], [bmax[0], bmax[1], bmin[2]], [bmin[0], bmax[1], bmin[2]]] },
+          // down (bottom, -Y)
+          { name: "down",  p: [[bmin[0], bmin[1], bmin[2]], [bmax[0], bmin[1], bmin[2]], [bmax[0], bmin[1], bmax[2]], [bmin[0], bmin[1], bmax[2]]] },
+        ];
+        for (const f of faces) {
+          const uvRect = cube.uv?.[f.name];
+          const baseIndex = positions.length / 3;
+          for (const corner of f.p) {
+            const [x, y, z] = t(corner); // bedrock -> three
+            positions.push(x, y, z);
+          }
+          if (uvRect) {
+            const { u, v, w, h, mirror } = uvRect;
+            const u0 = mirror ? u + w : u;
+            const u1 = mirror ? u : u + w;
+            const vBot = 1 - (v + h);
+            const vTop = 1 - v;
+            uvs.push(u0, vBot, u1, vBot, u1, vTop, u0, vTop);
+          } else {
+            uvs.push(0, 0, 1, 0, 1, 1, 0, 1);
+          }
+          indices.push(baseIndex, baseIndex + 1, baseIndex + 2, baseIndex, baseIndex + 2, baseIndex + 3);
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+        g.setIndex(indices);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      function buildBoneNode(bone, material, parentPivot) {
+        const group = new THREE.Group();
+        group.name = bone.name;
+        // bone.pivot is in the PARENT's local frame. The parent group is
+        // already positioned at parentPivot, so the child's local position
+        // relative to the parent group is (pivot - parentPivot).
+        const [px, py, pz] = bone.pivot || [0, 0, 0];
+        const [ppx, ppy, ppz] = parentPivot || [0, 0, 0];
+        group.position.set(...bedrockToThree([px - ppx, py - ppy, pz - ppz]));
+        // Rest-pose rotation: apply both `rotation` and `bind_pose_rotation`
+        // (Bedrock 1.8 format uses bind_pose_rotation for the rest pose).
+        // Use Bedrock rotation values directly (no sign negation needed now
+        // that cube vertices are consistently Z-flipped via bedrockToThree).
+        const rot = bone.rotation || bone.bind_pose_rotation;
+        if (rot && (rot[0] || rot[1] || rot[2])) {
+          group.rotation.set(
+            THREE.MathUtils.degToRad(rot[0] || 0),
+            THREE.MathUtils.degToRad(rot[1] || 0),
+            THREE.MathUtils.degToRad(rot[2] || 0),
+          );
+        }
+        // Each cube may have its own pivot + rotation (Bedrock 1.16+). We
+        // represent that as a child Group per cube, positioned at
+        // (cube.pivot - bone.pivot) in the bone's local frame and rotated by
+        // the cube's rotation. The cube geometry itself is built relative to
+        // the cube's pivot (origin - cube.pivot).
+        const bp = bone.pivot || [0, 0, 0];
+        for (const cube of bone.cubes || []) {
+          const cubeRot = cube.rotation;
+          // Default cube pivot: if a cube has a rotation but no explicit pivot,
+          // use the cube's center (origin + size/2). This matches Blockbench and
+          // fixes rotated bodies (pig, ender_crystal, minecart) that would
+          // otherwise rotate around the bone origin. For non-rotated cubes the
+          // pivot is irrelevant to placement, so we keep the bone pivot.
+          const cubeCenter = [
+            cube.origin[0] + cube.size[0] / 2,
+            cube.origin[1] + cube.size[1] / 2,
+            cube.origin[2] + cube.size[2] / 2,
+          ];
+          const hasRot = cubeRot && (cubeRot[0] || cubeRot[1] || cubeRot[2]);
+          const cubePivot = cube.pivot
+            ? cube.pivot
+            : hasRot
+              ? cubeCenter
+              : bp;
+          // Build geometry relative to the cube's pivot.
+          const geo = buildCubeGeometry(cube, cubePivot);
+          if (cubeRot && (cubeRot[0] || cubeRot[1] || cubeRot[2])) {
+            // Wrap in a group positioned at (cube.pivot - bone.pivot) with the
+            // cube's rotation. The geometry is already relative to cube.pivot.
+            const cubeGroup = new THREE.Group();
+            const rel = [cubePivot[0] - bp[0], cubePivot[1] - bp[1], cubePivot[2] - bp[2]];
+            cubeGroup.position.set(...bedrockToThree(rel));
+            cubeGroup.rotation.set(
+              THREE.MathUtils.degToRad(cubeRot[0] || 0),
+              THREE.MathUtils.degToRad(cubeRot[1] || 0),
+              THREE.MathUtils.degToRad(cubeRot[2] || 0),
+            );
+            const mesh = new THREE.Mesh(geo, material);
+            cubeGroup.add(mesh);
+            group.add(cubeGroup);
+          } else {
+            // No per-cube rotation: geometry is relative to bone pivot (build
+            // with bonePivot so origin - bonePivot gives bone-local coords).
+            const geo2 = buildCubeGeometry(cube, bp);
+            const mesh = new THREE.Mesh(geo2, material);
+            group.add(mesh);
+          }
+        }
+        return group;
+      }
+
+      let rootGroup = null;
+
+      function loadTexture(url) {
+        return new Promise((resolve, reject) => {
+          new THREE.TextureLoader().load(url, resolve, undefined, reject);
+        });
+      }
+
+      async function buildScene(mesh, textureBaseUrl) {
+        if (rootGroup) {
+          scene.remove(rootGroup);
+          rootGroup.traverse((o) => {
+            if (o.geometry) o.geometry.dispose();
+          });
+        }
+        rootGroup = new THREE.Group();
+        const texPath = mesh.texture;
+        let material;
+        if (texPath) {
+          const url = textureBaseUrl + "/" + texPath.replace(/^\.\//, "");
+          const tex = await loadTexture(url);
+          tex.magFilter = THREE.NearestFilter;
+          tex.minFilter = THREE.NearestMipmapNearestFilter;
+          tex.generateMipmaps = true;
+          tex.colorSpace = THREE.SRGBColorSpace;
+          material = new THREE.MeshBasicMaterial({
+            map: tex,
+            alphaTest: 0.5,
+            side: THREE.DoubleSide,
+            transparent: false,
+          });
+        } else {
+          material = new THREE.MeshBasicMaterial({ color: 0xff66ff });
+        }
+
+        const bones = mesh.geometry?.bones || [];
+        const pivotByName = new Map();
+        for (const b of bones) pivotByName.set(b.name, b.pivot || [0, 0, 0]);
+        const nodeByName = new Map();
+        for (const bone of bones) {
+          const parentPivot = bone.parent ? (pivotByName.get(bone.parent) || [0, 0, 0]) : [0, 0, 0];
+          nodeByName.set(bone.name, buildBoneNode(bone, material, parentPivot));
+        }
+        for (const bone of bones) {
+          const node = nodeByName.get(bone.name);
+          if (bone.parent && nodeByName.has(bone.parent)) {
+            nodeByName.get(bone.parent).add(node);
+          } else {
+            rootGroup.add(node);
+          }
+        }
+        scene.add(rootGroup);
+
+        // Auto-frame: bounding box of all mesh vertices in world space.
+        rootGroup.updateMatrixWorld(true);
+        const box2 = new THREE.Box3();
+        rootGroup.traverse((o) => {
+          if (o.isMesh && o.geometry) {
+            const pos = o.geometry.attributes.position;
+            const v = new THREE.Vector3();
+            for (let i = 0; i < pos.count; i++) {
+              v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+              box2.expandByPoint(v);
+            }
+          }
+        });
+        if (box2.isEmpty()) {
+          box2.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(16, 16, 16));
+        }
+        const center = box2.getCenter(new THREE.Vector3());
+        const size = box2.getSize(new THREE.Vector3());
+        const radius = Math.max(size.x, size.y, size.z, 1) * 0.8;
+        return { center, radius };
+      }
+
+      function setFrame(w, h, useIso) {
+        renderer.setSize(w, h, false);
+        canvas.width = w;
+        canvas.height = h;
+        if (useIso) {
+          isoCamera.left = -w / 2;
+          isoCamera.right = w / 2;
+          isoCamera.top = h / 2;
+          isoCamera.bottom = -h / 2;
+          isoCamera.updateProjectionMatrix();
+        } else {
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        }
+      }
+
+      // Classic Minecraft item-render angle: ~30° elevation, then orbit for spin.
+      // useIso: use the orthographic camera (true isometric, no vanishing points)
+      // for the headshot; perspective camera for the spin orbit.
+      function setCamera(center, radius, azimuthDeg, elevationDeg = 30, useIso = false) {
+        const az = THREE.MathUtils.degToRad(azimuthDeg);
+        const el = THREE.MathUtils.degToRad(elevationDeg);
+        const cam = useIso ? isoCamera : camera;
+        let dist;
+        if (useIso) {
+          // For ortho, position far enough that near/far don't clip; zoom via
+          // frustum size which is set in setFrame using the radius.
+          dist = radius * 10;
+        } else {
+          dist = radius / Math.sin(THREE.MathUtils.degToRad(cam.fov / 2));
+        }
+        const x = center.x + dist * Math.cos(el) * Math.sin(az);
+        const y = center.y + dist * Math.sin(el);
+        const z = center.z + dist * Math.cos(el) * Math.cos(az);
+        cam.position.set(x, y, z);
+        cam.lookAt(center);
+        if (useIso) {
+          // Set the frustum so `radius` maps to ~half the smaller viewport
+          // dimension, giving the mob the same framing as the perspective view.
+          const half = radius;
+          isoCamera.left = -half * (canvas.width / canvas.height);
+          isoCamera.right = half * (canvas.width / canvas.height);
+          isoCamera.top = half;
+          isoCamera.bottom = -half;
+          isoCamera.updateProjectionMatrix();
+        }
+      }
+
+      // ---- bridge to the Puppeteer driver ----------------------------------
+      window.__mrpSetMesh = async (mesh, textureBaseUrl) => {
+        const { center, radius } = await buildScene(mesh, textureBaseUrl);
+        window.__mrpCenter = center;
+        window.__mrpRadius = radius;
+        window.__mrpRoot = rootGroup;
+        window.__mrpScene = scene;
+      };
+      // useIso: true = orthographic isometric (headshot), false = perspective (spin)
+      window.__mrpRender = async (azimuthDeg, width, height, useIso = false) => {
+        const cam = useIso ? isoCamera : camera;
+        setFrame(width, height, useIso);
+        setCamera(window.__mrpCenter, window.__mrpRadius, azimuthDeg, 30, useIso);
+        renderer.render(scene, cam);
+        return true;
+      };
+      window.__mrpReady = true;
+    </script>
+  </body>
+</html>

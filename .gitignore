@@ -1,0 +1,6 @@
+# Local cache of downloaded/extracted source data. Never committed.
+cache/
+node_modules/
+*.log
+.DS_Store
+.env
