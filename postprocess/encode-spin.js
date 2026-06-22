@@ -36,13 +36,23 @@ async function encodeGIF(sharp, GIFEncoder, framePaths, outPath, fps, w, h) {
   encoder.setDelay(Math.round(1000 / fps));
   encoder.setRepeat(0); // 0 = loop forever
   encoder.setThreshold(20);
+  // Frame disposal: 2 = restore to background after each frame. This
+  // prevents the "ghosting" / "trailing frames" effect where each frame
+  // composites on top of the previous one. Without this, the GIF looks
+  // like it's accumulating paint strokes (the "Windows XP paint" effect).
+  encoder.setDispose(2);
+  // Set a transparent color so cleared areas show through. Use black (0,0,0)
+  // since the frames are flattened onto black. The transparent color index
+  // maps to alpha=0 in the source PNG.
+  encoder.setTransparent(0x000000);
   const stream = fs.createWriteStream(outPath);
   encoder.pipe?.(stream) || encoder.createReadStream().pipe(stream);
   encoder.start();
   for (const p of framePaths) {
     // GIF has 1-bit alpha; flatten onto black so the silhouette binarizes
-    // cleanly. The WebP is encoded separately from PNG frames (not from
-    // this GIF) to preserve full 8-bit alpha.
+    // cleanly. Transparent pixels (alpha=0) become black, which we set as
+    // the transparent color. The WebP is encoded separately from PNG frames
+    // (not from this GIF) to preserve full 8-bit alpha.
     // IMPORTANT: gif-encoder-2's analyzePixels assumes 4-channel RGBA input.
     // .ensureAlpha() forces 4-channel output so the encoder reads the right
     // bytes (see AGENTS.md for the bug history).
