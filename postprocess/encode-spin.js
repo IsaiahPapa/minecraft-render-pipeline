@@ -3,16 +3,13 @@
 // §6.7 Spin animation encoder.
 //
 // Encodes the per-frame PNGs in output/<slug>/spin/ into:
-//   - output/<slug>/spin.gif    (animated GIF, 1-bit alpha — legacy/compat)
-//   - output/<slug>/spin.webp   (animated WebP, full 8-bit alpha via cwebp+webpmux)
+//   - output/<slug>/spin.gif    (animated GIF via ffmpeg, proper frame disposal)
+//   - output/<slug>/spin.webp   (animated WebP via cwebp+webpmux, full 8-bit alpha)
 //
-// The WebP is encoded directly from the PNG frames using cwebp (lossless)
-// and muxed into an animation with webpmux. This preserves full alpha
-// transparency, unlike the previous approach of transcoding from GIF
-// (which flattened onto black and lost alpha).
-//
-// The GIF is a legacy export with 1-bit alpha (jagged silhouette edges).
-// This tradeoff is documented in the README.
+// Both encoders preserve transparency. The GIF uses ffmpeg's paletteuse
+// with diff_mode=rectangle and alpha_threshold to ensure each frame clears
+// the previous one (no ghosting/trailing). The WebP is lossless with full
+// alpha from the PNG source frames.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -30,42 +27,21 @@ function parseArgs(argv) {
   return o;
 }
 
-async function encodeGIF(sharp, GIFEncoder, framePaths, outPath, fps, w, h) {
-  const encoder = new GIFEncoder(w, h);
-  encoder.setQuality(10);
-  encoder.setDelay(Math.round(1000 / fps));
-  encoder.setRepeat(0); // 0 = loop forever
-  encoder.setThreshold(20);
-  // Frame disposal: 2 = restore to background after each frame. This
-  // prevents the "ghosting" / "trailing frames" effect where each frame
-  // composites on top of the previous one. Without this, the GIF looks
-  // like it's accumulating paint strokes (the "Windows XP paint" effect).
-  encoder.setDispose(2);
-  // Set a transparent color so cleared areas show through. Use black (0,0,0)
-  // since the frames are flattened onto black. The transparent color index
-  // maps to alpha=0 in the source PNG.
-  encoder.setTransparent(0x000000);
-  const stream = fs.createWriteStream(outPath);
-  encoder.pipe?.(stream) || encoder.createReadStream().pipe(stream);
-  encoder.start();
-  for (const p of framePaths) {
-    // GIF has 1-bit alpha; flatten onto black so the silhouette binarizes
-    // cleanly. Transparent pixels (alpha=0) become black, which we set as
-    // the transparent color. The WebP is encoded separately from PNG frames
-    // (not from this GIF) to preserve full 8-bit alpha.
-    // IMPORTANT: gif-encoder-2's analyzePixels assumes 4-channel RGBA input.
-    // .ensureAlpha() forces 4-channel output so the encoder reads the right
-    // bytes (see AGENTS.md for the bug history).
-    const { data } = await sharp(p)
-      .resize(w, h, { fit: "fill" })
-      .flatten({ background: { r: 0, g: 0, b: 0, alpha: 1 } })
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    encoder.addFrame(data);
-  }
-  encoder.finish();
-  await new Promise((r) => stream.on("close", r));
+function encodeGIF(frameDir, outPath, fps, w, h) {
+  // Use ffmpeg with two-pass palette generation for proper transparency + disposal.
+  // diff_mode=rectangle ensures each frame only encodes changed pixels, and
+  // alpha_threshold=128 makes transparent pixels (alpha < 128) fully transparent
+  // in the GIF palette. This prevents the ghosting/trailing effect where frames
+  // composite on top of each other.
+  const inputPattern = path.join(frameDir, "%03d.png");
+  execFileSync("ffmpeg", [
+    "-y", "-framerate", String(fps),
+    "-i", inputPattern,
+    "-vf", `scale=${w}:${h}:flags=neighbor,split[s0][s1];[s0]palettegen=max_colors=128:reserve_transparent=1:transparency_color=0x000000[p];[s1][p]paletteuse=dither=none:alpha_threshold=128:diff_mode=rectangle`,
+    "-loop", "0",
+    "-plays", "0",
+    outPath,
+  ], { stdio: ["pipe", "pipe", "pipe"] });
 }
 
 function encodeAnimatedWebP(framePaths, outPath, fps) {
@@ -77,27 +53,19 @@ function encodeAnimatedWebP(framePaths, outPath, fps) {
   const webpFrames = [];
   for (let i = 0; i < framePaths.length; i++) {
     const frameWebP = path.join(tmpDir, `f${String(i).padStart(4, "0")}.webp`);
-    execFileSync("cwebp", [
-      "-lossless",
-      "-quiet",
-      framePaths[i],
-      "-o",
-      frameWebP,
-    ]);
+    execFileSync("cwebp", ["-lossless", "-quiet", framePaths[i], "-o", frameWebP]);
     webpFrames.push(frameWebP);
   }
-  // Build webpmux args: -frame <file> +<delay> -loop 0 -o <output>
   const muxArgs = [];
   for (let i = 0; i < webpFrames.length; i++) {
     muxArgs.push("-frame", webpFrames[i], `+${delay}`);
   }
   muxArgs.push("-loop", "0", "-o", outPath);
   execFileSync("webpmux", muxArgs);
-  // Clean up temp frames
   fs.rmSync(tmpDir, { recursive: true, force: true });
 }
 
-async function processSlug(slug, sharp, GIFEncoder, fps) {
+async function processSlug(slug, sharp, fps) {
   const spinDir = path.join(OUTPUT_DIR, slug, "spin");
   if (!fs.existsSync(spinDir)) return false;
   const frameFiles = fs.readdirSync(spinDir).filter((f) => f.endsWith(".png")).sort();
@@ -107,9 +75,9 @@ async function processSlug(slug, sharp, GIFEncoder, fps) {
   const w = firstMeta.width;
   const h = firstMeta.height;
 
-  // Encode GIF (legacy, 1-bit alpha).
+  // Encode GIF (ffmpeg, proper disposal + transparency).
   const gifPath = path.join(OUTPUT_DIR, slug, "spin.gif");
-  await encodeGIF(sharp, GIFEncoder, framePaths, gifPath, fps, w, h);
+  encodeGIF(spinDir, gifPath, fps, w, h);
 
   // Encode animated WebP (full alpha via cwebp + webpmux).
   const webpPath = path.join(OUTPUT_DIR, slug, "spin.webp");
@@ -123,7 +91,6 @@ async function processSlug(slug, sharp, GIFEncoder, fps) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const sharp = (await import("sharp")).default;
-  const { default: GIFEncoder } = await import("gif-encoder-2");
   let slugs;
   if (opts.entity) {
     slugs = [entitySlug(opts.entity)];
@@ -135,7 +102,7 @@ async function main() {
   let fail = 0;
   for (const slug of slugs) {
     try {
-      await processSlug(slug, sharp, GIFEncoder, opts.fps);
+      await processSlug(slug, sharp, opts.fps);
       log(`[${slug}] spin encoded`);
       ok++;
     } catch (err) {
