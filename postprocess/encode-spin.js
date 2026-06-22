@@ -28,20 +28,30 @@ function parseArgs(argv) {
 }
 
 function encodeGIF(frameDir, outPath, fps, w, h) {
-  // Use ffmpeg with two-pass palette generation for proper transparency + disposal.
-  // diff_mode=rectangle ensures each frame only encodes changed pixels, and
-  // alpha_threshold=128 makes transparent pixels (alpha < 128) fully transparent
-  // in the GIF palette. This prevents the ghosting/trailing effect where frames
-  // composite on top of each other.
+  // Two-step: ffmpeg encodes the GIF with palette optimization, then gifsicle
+  // post-processes it to set disposal=bg (restore to background) on every frame.
+  // This combination ensures frames are properly cleared between animation
+  // steps, preventing the "ghosting"/"overlay" effect where frames stack on
+  // top of each other.
   const inputPattern = path.join(frameDir, "%03d.png");
+  const rawGif = outPath + ".raw.gif";
   execFileSync("ffmpeg", [
     "-y", "-framerate", String(fps),
     "-i", inputPattern,
-    "-vf", `scale=${w}:${h}:flags=neighbor,split[s0][s1];[s0]palettegen=max_colors=128:reserve_transparent=1:transparency_color=0x000000[p];[s1][p]paletteuse=dither=none:alpha_threshold=128:diff_mode=rectangle`,
+    "-vf", `scale=${w}:${h}:flags=neighbor,split[s0][s1];[s0]palettegen=max_colors=128:reserve_transparent=1:transparency_color=0x000000[p];[s1][p]paletteuse=dither=none:alpha_threshold=128`,
     "-loop", "0",
     "-plays", "0",
-    outPath,
+    rawGif,
   ], { stdio: ["pipe", "pipe", "pipe"] });
+  // Post-process with gifsicle to set disposal=bg on all frames.
+  execFileSync("gifsicle", [
+    "--disposal=bg",
+    "--loop=0",
+    `--delay=${Math.round(100 / fps)}`,
+    rawGif,
+    "-o", outPath,
+  ], { stdio: ["pipe", "pipe", "pipe"] });
+  fs.rmSync(rawGif, { force: true });
 }
 
 function encodeAnimatedWebP(framePaths, outPath, fps) {
