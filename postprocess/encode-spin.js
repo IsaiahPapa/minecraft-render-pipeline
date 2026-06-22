@@ -4,22 +4,20 @@
 //
 // Encodes the per-frame PNGs in output/<slug>/spin/ into:
 //   - output/<slug>/spin.gif    (animated GIF, 1-bit alpha — legacy/compat)
-//   - output/<slug>/spin.webp   (animated WebP, transcoded from the GIF)
+//   - output/<slug>/spin.webp   (animated WebP, full 8-bit alpha via cwebp+webpmux)
 //
-// Why GIF-first: sharp can read an animated GIF and transcode to animated
-// WebP, but cannot directly build an animated WebP from a stack of PNG
-// frames without an intermediate animated input. So we encode the GIF
-// first (gif-encoder-2) and transcode it to WebP (sharp).
+// The WebP is encoded directly from the PNG frames using cwebp (lossless)
+// and muxed into an animation with webpmux. This preserves full alpha
+// transparency, unlike the previous approach of transcoding from GIF
+// (which flattened onto black and lost alpha).
 //
-// Per spec §6.7 the GIF tradeoff (1-bit alpha -> jagged silhouette edges) is
-// documented in the README, not silent. The WebP inherits the GIF's 1-bit
-// alpha as a known limitation of v1 — future work could use a real animated
-// WebP encoder (e.g. webpmux / cwebp) to preserve 8-bit alpha from the PNG
-// frames directly.
+// The GIF is a legacy export with 1-bit alpha (jagged silhouette edges).
+// This tradeoff is documented in the README.
 
 import fs from "node:fs";
 import path from "node:path";
-import { readJson, log, DIRS, entitySlug } from "../scripts/lib.js";
+import { execFileSync } from "node:child_process";
+import { readJson, log, DIRS, entitySlug, ensureDir } from "../scripts/lib.js";
 
 const OUTPUT_DIR = path.join(DIRS.output);
 
@@ -43,12 +41,11 @@ async function encodeGIF(sharp, GIFEncoder, framePaths, outPath, fps, w, h) {
   encoder.start();
   for (const p of framePaths) {
     // GIF has 1-bit alpha; flatten onto black so the silhouette binarizes
-    // cleanly. The WebP (transcoded from this GIF) inherits this limitation.
-    // IMPORTANT: gif-encoder-2's analyzePixels assumes 4-channel RGBA input
-    // (it reads data[b], data[b+1], data[b+2] and skips data[b+3]). sharp's
-    // .flatten() alone produces 3-channel RGB, which misaligns every pixel
-    // and scrambles colors into "matrix/scan-line" artifacts. .ensureAlpha()
-    // forces a 4-channel output so the encoder reads the right bytes.
+    // cleanly. The WebP is encoded separately from PNG frames (not from
+    // this GIF) to preserve full 8-bit alpha.
+    // IMPORTANT: gif-encoder-2's analyzePixels assumes 4-channel RGBA input.
+    // .ensureAlpha() forces 4-channel output so the encoder reads the right
+    // bytes (see AGENTS.md for the bug history).
     const { data } = await sharp(p)
       .resize(w, h, { fit: "fill" })
       .flatten({ background: { r: 0, g: 0, b: 0, alpha: 1 } })
@@ -61,10 +58,33 @@ async function encodeGIF(sharp, GIFEncoder, framePaths, outPath, fps, w, h) {
   await new Promise((r) => stream.on("close", r));
 }
 
-async function encodeWebPFromGIF(sharp, gifPath, outPath) {
-  await sharp(gifPath, { animated: true })
-    .webp({ quality: 100, lossless: true, effort: 4 })
-    .toFile(outPath);
+function encodeAnimatedWebP(framePaths, outPath, fps) {
+  // Encode each PNG frame as a lossless WebP with full alpha, then mux
+  // them into an animated WebP using webpmux.
+  const tmpDir = path.join(path.dirname(outPath), ".webp-tmp");
+  ensureDir(tmpDir);
+  const delay = Math.round(1000 / fps);
+  const webpFrames = [];
+  for (let i = 0; i < framePaths.length; i++) {
+    const frameWebP = path.join(tmpDir, `f${String(i).padStart(4, "0")}.webp`);
+    execFileSync("cwebp", [
+      "-lossless",
+      "-quiet",
+      framePaths[i],
+      "-o",
+      frameWebP,
+    ]);
+    webpFrames.push(frameWebP);
+  }
+  // Build webpmux args: -frame <file> +<delay> -loop 0 -o <output>
+  const muxArgs = [];
+  for (let i = 0; i < webpFrames.length; i++) {
+    muxArgs.push("-frame", webpFrames[i], `+${delay}`);
+  }
+  muxArgs.push("-loop", "0", "-o", outPath);
+  execFileSync("webpmux", muxArgs);
+  // Clean up temp frames
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 }
 
 async function processSlug(slug, sharp, GIFEncoder, fps) {
@@ -77,10 +97,14 @@ async function processSlug(slug, sharp, GIFEncoder, fps) {
   const w = firstMeta.width;
   const h = firstMeta.height;
 
+  // Encode GIF (legacy, 1-bit alpha).
   const gifPath = path.join(OUTPUT_DIR, slug, "spin.gif");
   await encodeGIF(sharp, GIFEncoder, framePaths, gifPath, fps, w, h);
+
+  // Encode animated WebP (full alpha via cwebp + webpmux).
   const webpPath = path.join(OUTPUT_DIR, slug, "spin.webp");
-  await encodeWebPFromGIF(sharp, gifPath, webpPath);
+  encodeAnimatedWebP(framePaths, webpPath, fps);
+
   // Frames are now embedded in the animations; remove to keep output clean.
   fs.rmSync(spinDir, { recursive: true, force: true });
   return true;
