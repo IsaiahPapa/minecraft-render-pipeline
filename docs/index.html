@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minecraft Mob Renders</title>
+    <style>
+      :root {
+        --bg: #1a1a2e;
+        --surface: #16213e;
+        --surface2: #0f3460;
+        --accent: #e94560;
+        --text: #eee;
+        --text-dim: #aaa;
+        --radius: 8px;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      header {
+        background: var(--surface);
+        padding: 20px 24px;
+        border-bottom: 2px solid var(--surface2);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      header h1 span { color: var(--accent); }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
+        flex-wrap: wrap;
+      }
+      .controls input[type="search"] {
+        background: var(--surface2);
+        border: 1px solid #333;
+        color: var(--text);
+        padding: 8px 14px;
+        border-radius: var(--radius);
+        font-size: 0.9rem;
+        width: 220px;
+      }
+      .controls input[type="search"]:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .controls select {
+        background: var(--surface2);
+        border: 1px solid #333;
+        color: var(--text);
+        padding: 8px 14px;
+        border-radius: var(--radius);
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .count {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+      }
+      main {
+        padding: 20px 24px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+        position: relative;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      }
+      .card img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        image-rendering: pixelated;
+        background: repeating-conic-gradient(#2a2a3e 0% 25%, #222236 0% 50%) 0 0 / 16px 16px;
+      }
+      .card .name {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-dim);
+      }
+      .card .badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.6rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        display: none;
+      }
+      .card.has-spin .badge { display: block; }
+      /* Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-overlay.open { display: flex; }
+      .modal {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+      .modal h2 {
+        margin-bottom: 16px;
+        color: var(--accent);
+      }
+      .modal .preview {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .modal .preview > div {
+        text-align: center;
+      }
+      .modal .preview img {
+        max-width: 180px;
+        max-height: 180px;
+        image-rendering: pixelated;
+        background: repeating-conic-gradient(#2a2a3e 0% 25%, #222236 0% 50%) 0 0 / 16px 16px;
+        border-radius: var(--radius);
+      }
+      .modal .preview label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        margin-top: 4px;
+      }
+      .modal .urls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .modal .url-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .modal .url-row label {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        min-width: 70px;
+        flex-shrink: 0;
+      }
+      .modal .url-row input {
+        flex: 1;
+        background: var(--bg);
+        border: 1px solid #333;
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: monospace;
+      }
+      .modal .url-row button {
+        background: var(--surface2);
+        border: none;
+        color: var(--text);
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+      .modal .url-row button:hover { background: var(--accent); }
+      .modal .close {
+        margin-top: 16px;
+        background: var(--surface2);
+        border: none;
+        color: var(--text);
+        padding: 8px 24px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        width: 100%;
+        font-size: 0.9rem;
+      }
+      .modal .close:hover { background: var(--accent); }
+      .empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-dim);
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Minecraft <span>Mob</span> Renders</h1>
+      <div class="controls">
+        <select id="version-select" title="Bedrock version"></select>
+        <input type="search" id="search" placeholder="Search mobs..." autocomplete="off" />
+        <span class="count" id="count"></span>
+      </div>
+    </header>
+    <main>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" style="display:none">No mobs found.</div>
+    </main>
+    <div class="footer">
+      Data from <a href="https://github.com/Mojang/bedrock-samples" target="_blank">Mojang/bedrock-samples</a>
+      &middot;
+      Pipeline at <a href="https://github.com/IsaiahPapa/minecraft-render-pipeline" target="_blank">IsaiahPapa/minecraft-render-pipeline</a>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" id="modal">
+        <h2 id="modal-title"></h2>
+        <div class="preview" id="modal-preview"></div>
+        <div class="urls" id="modal-urls"></div>
+        <button class="close" id="modal-close">Close</button>
+      </div>
+    </div>
+
+    <script>
+      const REPO = "IsaiahPapa/minecraft-render-pipeline";
+      const BASE = `https://cdn.jsdelivr.net/gh/${REPO}`;
+      let manifest = null;
+      let version = "latest";
+
+      async function loadVersions() {
+        // Try to fetch available versions from the dist/ directory via GitHub API
+        try {
+          const res = await fetch(`https://api.github.com/repos/${REPO}/contents/dist`);
+          const data = await res.json();
+          const versions = data
+            .filter((e) => e.type === "dir" && e.name !== "latest")
+            .map((e) => e.name)
+            .sort()
+            .reverse();
+          const select = document.getElementById("version-select");
+          select.innerHTML = "";
+          const latestOpt = document.createElement("option");
+          latestOpt.value = "latest";
+          latestOpt.textContent = "Latest";
+          select.appendChild(latestOpt);
+          for (const v of versions) {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.textContent = `Bedrock ${v}`;
+            select.appendChild(opt);
+          }
+          select.value = versions[0] || "latest";
+          version = select.value;
+        } catch (e) {
+          // Fallback: just use latest
+          const select = document.getElementById("version-select");
+          select.innerHTML = '<option value="latest">Latest</option>';
+          version = "latest";
+        }
+      }
+
+      async function loadManifest() {
+        const url = `${BASE}@${version === "latest" ? "main" : "bedrock-" + version}/dist/${version}/manifest.json`;
+        try {
+          const res = await fetch(url);
+          manifest = await res.json();
+          renderGrid();
+        } catch (e) {
+          console.error("Failed to load manifest:", e);
+          document.getElementById("empty").style.display = "block";
+          document.getElementById("empty").textContent = "Failed to load manifest.";
+        }
+      }
+
+      function distBase() {
+        const tag = version === "latest" ? "main" : "bedrock-" + version;
+        return `${BASE}@${tag}/dist/${version}`;
+      }
+
+      function slugFromEntry(ident) {
+        return ident.replace(/^minecraft:/, "").replace(/:/g, "_");
+      }
+
+      function renderGrid() {
+        const search = document.getElementById("search").value.toLowerCase().trim();
+        const grid = document.getElementById("grid");
+        const entries = Object.entries(manifest.entities || {});
+        const filtered = entries.filter(([ident]) =>
+          ident.toLowerCase().includes(search),
+        );
+
+        document.getElementById("count").textContent = `${filtered.length} mobs`;
+
+        if (filtered.length === 0) {
+          grid.innerHTML = "";
+          document.getElementById("empty").style.display = "block";
+          return;
+        }
+        document.getElementById("empty").style.display = "none";
+
+        const base = distBase();
+        grid.innerHTML = filtered
+          .map(([ident, info]) => {
+            const slug = slugFromEntry(ident);
+            const displayName = ident.replace(/^minecraft:/, "");
+            const headshotUrl = info.headshot ? `${base}/${info.headshot}` : "";
+            const hasSpin = !!(info.spin_webp || info.spin_gif);
+            return `<div class="card${hasSpin ? " has-spin" : ""}" data-ident="${ident}">
+              <img src="${headshotUrl}" loading="lazy" alt="${displayName}" />
+              <div class="name">${displayName}</div>
+              <span class="badge">SPIN</span>
+            </div>`;
+          })
+          .join("");
+
+        grid.querySelectorAll(".card").forEach((card) => {
+          card.addEventListener("click", () => {
+            const ident = card.dataset.ident;
+            openModal(ident);
+          });
+        });
+      }
+
+      function openModal(ident) {
+        const info = manifest.entities[ident];
+        if (!info) return;
+        const slug = slugFromEntry(ident);
+        const base = distBase();
+        const tag = version === "latest" ? "main" : "bedrock-" + version;
+
+        document.getElementById("modal-title").textContent = ident;
+
+        const preview = document.getElementById("modal-preview");
+        preview.innerHTML = "";
+        if (info.headshot) {
+          preview.innerHTML += `<div><img src="${base}/${info.headshot}" alt="headshot" /><label>Headshot</label></div>`;
+        }
+        if (info.spin_webp) {
+          preview.innerHTML += `<div><img src="${base}/${info.spin_webp}" alt="spin" /><label>Spin (WebP)</label></div>`;
+        } else if (info.spin_gif) {
+          preview.innerHTML += `<div><img src="${base}/${info.spin_gif}" alt="spin" /><label>Spin (GIF)</label></div>`;
+        }
+
+        const urls = document.getElementById("modal-urls");
+        const paths = [];
+        if (info.headshot) paths.push(["Headshot PNG", `${base}/${info.headshot}`]);
+        if (info.spin_webp) paths.push(["Spin WebP", `${base}/${info.spin_webp}`]);
+        if (info.spin_gif) paths.push(["Spin GIF", `${base}/${info.spin_gif}`]);
+
+        urls.innerHTML = paths
+          .map(
+            ([label, url]) => `
+          <div class="url-row">
+            <label>${label}</label>
+            <input type="text" value="${url}" readonly onclick="this.select()" />
+            <button onclick="navigator.clipboard.writeText('${url}'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+          </div>`,
+          )
+          .join("");
+
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+
+      // Event listeners
+      document.getElementById("version-select").addEventListener("change", (e) => {
+        version = e.target.value;
+        loadManifest();
+      });
+      document.getElementById("search").addEventListener("input", renderGrid);
+      document.getElementById("modal-close").addEventListener("click", () => {
+        document.getElementById("modal-overlay").classList.remove("open");
+      });
+      document.getElementById("modal-overlay").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) {
+          document.getElementById("modal-overlay").classList.remove("open");
+        }
+      });
+
+      // Init
+      (async () => {
+        await loadVersions();
+        await loadManifest();
+      })();
+    </script>
+  </body>
+</html>
