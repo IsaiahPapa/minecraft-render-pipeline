@@ -225,6 +225,7 @@
         color: var(--text-dim);
         font-size: 0.8rem;
       }
+      .footer a { margin: 0 6px; }
     </style>
   </head>
   <body>
@@ -243,7 +244,9 @@
     <div class="footer">
       Data from <a href="https://github.com/Mojang/bedrock-samples" target="_blank">Mojang/bedrock-samples</a>
       &middot;
-      Pipeline at <a href="https://github.com/IsaiahPapa/minecraft-render-pipeline" target="_blank">IsaiahPapa/minecraft-render-pipeline</a>
+      <a href="#" id="manifest-link">Manifest JSON</a>
+      &middot;
+      Pipeline at <a href="https://github.com/IsaiahPapa/minecraft-render-pipeline" target="_blank">GitHub</a>
     </div>
 
     <div class="modal-overlay" id="modal-overlay">
@@ -414,6 +417,11 @@
       (async () => {
         await loadVersions();
         await loadManifest();
+        // Update manifest link with current version.
+        const manifestLink = document.getElementById("manifest-link");
+        const tag = version === "latest" ? "main" : "bedrock-" + version;
+        manifestLink.href = `${BASE}@${tag}/dist/${version}/manifest.json`;
+        manifestLink.target = "_blank";
       })();
     </script>
   </body>
